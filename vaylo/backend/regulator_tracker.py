@@ -1,0 +1,1 @@
+# Legal update scraper + GPT summarizer
