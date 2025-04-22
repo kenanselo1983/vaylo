@@ -1,6 +1,5 @@
 import requests
 
-# TEMP: Direct key injection
 OPENROUTER_API_KEY = "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"
 
 def summarize_policy(text):
@@ -8,7 +7,7 @@ def summarize_policy(text):
         return "❌ API key missing."
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer ",
         "Content-Type": "application/json"
     }
 
@@ -22,7 +21,7 @@ Ayrıca hangi alanlarda eksik ya da geliştirilmesi gerektiğini de öner.
 """
 
     data = {
-        "model": "anthropic/claude-3-sonnet-20240229",
+        "model": "mistral/mistral-7b-instruct",
         "messages": [
             {"role": "user", "content": prompt}
         ],
