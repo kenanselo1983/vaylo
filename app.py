@@ -149,6 +149,8 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Yanıt hazırlanıyor..."):
-            answer = ask_chatbot(st.session_state.chat_history)
+           context = "You are a legal assistant specialized in Turkish KVKK and GDPR."
+answer = ask_chatbot(context, user_input)
+
             st.markdown(answer)
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
