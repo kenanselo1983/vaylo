@@ -7,6 +7,7 @@ from backend.pdf_exporter import generate_html_report
 from backend.law_watcher import summarize
 from backend.scraper import fetch_kvkk_updates
 from backend.chatbot import ask_chatbot
+from backend.suggestions import suggest_fixes
 
 USERS = {"1": "1"}
 
@@ -70,6 +71,12 @@ if records:
     if results:
         df_results = pd.DataFrame(results)
         st.dataframe(df_results)
+
+        if st.button("💡 Suggest Compliance Improvements"):
+            with st.spinner("Analyzing violations..."):
+                suggestions = suggest_fixes(results)
+                st.success("✅ Suggestions ready:")
+                st.text_area("🧠 AI Suggestions", suggestions, height=300)
 
         html_data = generate_html_report(results)
         st.subheader("🧾 Compliance Report (HTML View)")
