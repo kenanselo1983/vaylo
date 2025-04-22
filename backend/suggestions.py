@@ -20,8 +20,14 @@ def suggest_fixes(text):
         ]
     }
 
-    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-    response.raise_for_status()
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"]
+        return content.strip().split("\n")
 
-    suggestions = response.json()["choices"][0]["message"]["content"]
-    return suggestions.strip().split("\n")
+    except requests.exceptions.HTTPError as e:
+        return [f"❌ GPT Error: {e.response.status_code} - {e.response.text}"]
+
+    except Exception as e:
+        return [f"❌ Unexpected Error: {str(e)}"]
