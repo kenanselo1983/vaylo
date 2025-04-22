@@ -14,7 +14,7 @@ def ask_chatbot(messages):
     }
 
     data = {
-        "model": "mistralai/mixtral-8x7b",  # you can change to claude or gpt if you have credits
+        "model": "anthropic/claude-3-sonnet-20240229",
         "messages": messages,
         "stream": False
     }
