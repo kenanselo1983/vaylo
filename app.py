@@ -145,12 +145,13 @@ user_input = st.chat_input("Ask a KVKK or GDPR question in English or Turkish...
 if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
+
     st.session_state.chat_history.append({"role": "user", "content": user_input})
 
     with st.chat_message("assistant"):
         with st.spinner("Yanıt hazırlanıyor..."):
-           context = "You are a legal assistant specialized in Turkish KVKK and GDPR."
-answer = ask_chatbot(context, user_input)
-
+            context = "You are a legal assistant specialized in Turkish KVKK and GDPR."
+            answer = ask_chatbot(context, user_input)
             st.markdown(answer)
+
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
