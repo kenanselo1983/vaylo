@@ -21,5 +21,9 @@ def ask_chatbot(context, question):
     }
 
     response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
-    response.raise_for_status()
+
+    if not response.ok:
+        st.error(f"❌ GPT Error: {response.status_code} - {response.text}")
+        return "[Error from GPT]"
+
     return response.json()["choices"][0]["message"]["content"]
