@@ -7,7 +7,7 @@ def summarize_policy(text):
         return "❌ API key missing."
 
     headers = {
-        "Authorization": f"Bearer ",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
     }
 
