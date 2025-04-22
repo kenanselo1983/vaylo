@@ -4,3 +4,4 @@ fpdf
 beautifulsoup4
 requests
 python-dotenv
+beautifulsoup4
