@@ -5,9 +5,7 @@ from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_html_report
 from backend.law_watcher import summarize
-
-def fetch_kvkk_updates():
-    return """6698 sayılı Kişisel Verilerin Korunması Kanunu, kişisel verilerin işlenmesinde bireylerin temel hak ve özgürlüklerini korumak amacıyla yürürlüğe girmiştir."""
+from backend.scraper import fetch_kvkk_updates
 
 USERS = {"1": "1"}
 
@@ -88,7 +86,7 @@ st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (AI-Powered)")
 
 if st.button("Fetch KVKK Summary"):
-    with st.spinner("Fetching and summarizing latest KVKK content..."):
+    with st.spinner("Fetching and summarizing latest KVKK content from kvkk.gov.tr..."):
         text = fetch_kvkk_updates()
         summary = summarize(text)
         st.success("✅ AI summary complete")
