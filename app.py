@@ -5,7 +5,6 @@ from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_pdf_report
 from backend.law_watcher import fetch_kvkk_updates, summarize
 
-# --- Mock user database ---
 USERS = {
     "admin@example.com": "admin123",
     "legal@company.com": "legalpass",
@@ -14,20 +13,22 @@ USERS = {
 
 def login():
     st.title("🔐 Vaylo Login")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if email in USERS and USERS[email] == password:
-            st.session_state.logged_in = True
-            st.session_state.user = email
-            st.experimental_rerun()
-        else:
-            st.error("❌ Invalid credentials")
+    with st.form("login_form"):
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Login")
+        if submitted:
+            if email in USERS and USERS[email] == password:
+                st.session_state.logged_in = True
+                st.session_state.user = email
+                st.rerun()
+            else:
+                st.error("❌ Invalid credentials")
 
 def logout():
     st.session_state.logged_in = False
     st.session_state.user = None
-    st.experimental_rerun()
+    st.rerun()
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
