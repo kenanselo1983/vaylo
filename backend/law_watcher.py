@@ -1,13 +1,12 @@
 import os
 import requests
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv()
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY")
 
 def summarize(text):
     if not OPENROUTER_API_KEY:
-        return "❌ API key missing. Please check your .env file."
+        return "❌ API key missing. Please check your Streamlit secrets."
 
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
