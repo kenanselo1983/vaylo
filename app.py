@@ -4,13 +4,19 @@ import streamlit.components.v1 as components
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_html_report
-from backend.law_watcher import fetch_kvkk_updates, summarize
+from backend.law_watcher import summarize, OPENROUTER_API_KEY
+from backend.law_watcher import summarize
+from backend.law_watcher import summarize
+from backend.law_watcher import summarize
 
-# --- Basic login ---
+def fetch_kvkk_updates():
+    # Temporary: just return sample text
+    return \"\"\"6698 sayılı Kişisel Verilerin Korunması Kanunu, kişisel verilerin işlenmesinde bireylerin temel hak ve özgürlüklerini korumak amacıyla yürürlüğe girmiştir.\"\"\"
+
 USERS = {"1": "1"}
 
 def login():
-    st.title("🔐 Vaylo Login")
+    st.title("�� Vaylo Login")
     with st.form("login_form"):
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
@@ -69,28 +75,25 @@ if records:
     if results:
         df_results = pd.DataFrame(results)
         st.dataframe(df_results)
+
+        html_data = generate_html_report(results)
+        st.subheader("🧾 Compliance Report (HTML View)")
+        components.html(html_data.decode("utf-8"), height=600, scrolling=True)
+        st.download_button(
+            label="💾 Download HTML Report",
+            data=html_data,
+            file_name="vaylo_report.html",
+            mime="text/html",
+        )
     else:
         st.success("🎉 No violations found!")
 
-    # Generate and show HTML report
-    html_data = generate_html_report(results)
-    st.subheader("🧾 Compliance Report (HTML View)")
-    components.html(html_data.decode("utf-8"), height=600, scrolling=True)
-
-    # Allow download
-    st.download_button(
-        label="💾 Download HTML Report",
-        data=html_data,
-        file_name="vaylo_report.html",
-        mime="text/html",
-    )
-
 st.markdown("---")
-st.subheader("🧠 KVKK Update Summary (Mock)")
+st.subheader("🧠 KVKK Update Summary (AI-Powered)")
 
 if st.button("Fetch KVKK Summary"):
-    with st.spinner("Fetching and summarizing KVKK page..."):
-        content = fetch_kvkk_updates()
-        summary = summarize(content)
-        st.success("Done!")
-        st.text_area("📝 GPT Summary:", summary, height=200)
+    with st.spinner("Fetching and summarizing latest KVKK content..."):
+        text = fetch_kvkk_updates()
+        summary = summarize(text)
+        st.success("✅ AI summary complete")
+        st.text_area("📄 Summary", summary, height=300)
