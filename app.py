@@ -165,3 +165,17 @@ if user_input:
             answer = ask_chatbot(st.session_state.chat_history)
             st.markdown(answer)
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
+
+elif option == "Load from Google Sheet":
+    sheet_url = st.text_input(
+        "Paste Google Sheet CSV URL",
+        value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+    )
+
+    if st.button("🔄 Load Google Sheet"):
+        records = load_google_sheet(sheet_url)
+        if records:
+            st.success(f"✅ Loaded {len(records)} rows from Google Sheet.")
+            st.dataframe(pd.DataFrame(records))
+        else:
+            st.error("❌ Couldn’t load sheet. Make sure it’s public and the URL is correct.")
