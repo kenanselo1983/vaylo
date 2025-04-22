@@ -9,6 +9,8 @@ from backend.scraper import fetch_kvkk_updates
 from backend.chatbot import ask_chatbot
 from backend.suggestions import suggest_fixes
 from backend.risk import calculate_risk_score, explain_risk_with_ai
+from backend.pdf_reader import extract_text_from_pdf
+from backend.policy_ai import summarize_policy
 
 USERS = {"1": "1"}
 
@@ -99,6 +101,20 @@ if records:
         )
     else:
         st.success("🎉 No violations found!")
+
+st.markdown("---")
+st.subheader("📄 Upload a Privacy Policy PDF")
+
+pdf_file = st.file_uploader("Upload a privacy policy (PDF)", type="pdf", key="pdf-upload")
+if pdf_file:
+    with st.spinner("Reading PDF..."):
+        policy_text = extract_text_from_pdf(pdf_file)
+        st.text_area("📖 Extracted Text", policy_text, height=200)
+    if st.button("🧠 Summarize and Suggest"):
+        with st.spinner("Thinking..."):
+            result = summarize_policy(policy_text)
+            st.success("✅ Summary and recommendations ready:")
+            st.text_area("📋 Policy AI Output", result, height=300)
 
 st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (AI-Powered)")
