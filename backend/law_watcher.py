@@ -14,10 +14,9 @@ def summarize(text):
     }
 
     data = {
-        "model": "openai/gpt-3.5-turbo",  # ✅ known working model
+        "model": "anthropic/claude-3-sonnet-20240229",
         "messages": [
-            {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
-            {"role": "user", "content": text}
+            {"role": "user", "content": "Summarize the following Turkish legal document in simple bullet points:\n\n" + text}
         ],
         "stream": False
     }
