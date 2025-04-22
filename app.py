@@ -4,19 +4,15 @@ import streamlit.components.v1 as components
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_html_report
-from backend.law_watcher import summarize, OPENROUTER_API_KEY
-from backend.law_watcher import summarize
-from backend.law_watcher import summarize
 from backend.law_watcher import summarize
 
 def fetch_kvkk_updates():
-    # Temporary: just return sample text
-    return \"\"\"6698 sayılı Kişisel Verilerin Korunması Kanunu, kişisel verilerin işlenmesinde bireylerin temel hak ve özgürlüklerini korumak amacıyla yürürlüğe girmiştir.\"\"\"
+    return """6698 sayılı Kişisel Verilerin Korunması Kanunu, kişisel verilerin işlenmesinde bireylerin temel hak ve özgürlüklerini korumak amacıyla yürürlüğe girmiştir."""
 
 USERS = {"1": "1"}
 
 def login():
-    st.title("�� Vaylo Login")
+    st.title("🔐 Vaylo Login")
     with st.form("login_form"):
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
