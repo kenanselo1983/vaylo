@@ -86,8 +86,9 @@ st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (AI-Powered)")
 
 if st.button("Fetch KVKK Summary"):
-    with st.spinner("Fetching and summarizing latest KVKK content from kvkk.gov.tr..."):
+    with st.spinner("Fetching and summarizing latest KVKK content..."):
         text = fetch_kvkk_updates()
+        st.text_area("📄 Raw KVKK Text", text, height=200)
         summary = summarize(text)
         st.success("✅ AI summary complete")
         st.text_area("📄 Summary", summary, height=300)
