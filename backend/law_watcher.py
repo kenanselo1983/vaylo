@@ -1,16 +1,32 @@
+import os
 import requests
-from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
-def fetch_kvkk_updates():
-    url = "https://www.kvkk.gov.tr/"
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        text_blocks = soup.find_all("p")
-        raw_text = " ".join(p.get_text(strip=True) for p in text_blocks)
-        return raw_text[:3000]
-    except Exception:
-        return "Failed to fetch content."
+load_dotenv()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def summarize(text):
-    return "[MOCK SUMMARY] This is a simulated summary of KVKK legal updates. Replace with GPT later."
+    if not OPENROUTER_API_KEY:
+        return "❌ API key missing. Please check your .env file."
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistral/mixtral-8x7b-instruct",
+        "messages": [
+            {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
+            {"role": "user", "content": text}
+        ]
+    }
+
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers=headers,
+        json=data
+    )
+
+    result = response.json()
+    return result["choices"][0]["message"]["content"]
