@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def fetch_kvkk_updates():
-    url = "https://www.kvkk.gov.tr/Icerik/6649/Kisisel-Verilerin-Korunmasi-Kanunu"
+    url = "https://www.kvkk.gov.tr/Icerik/6639/KVKK-Hakkinda"
     response = requests.get(url, timeout=10)
     soup = BeautifulSoup(response.content, "html.parser")
 
