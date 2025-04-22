@@ -1,7 +1,7 @@
 import requests
-import streamlit as st
 
-OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY")
+# TEMP: Direct key injection
+OPENROUTER_API_KEY = "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"
 
 def summarize_policy(text):
     if not OPENROUTER_API_KEY:
