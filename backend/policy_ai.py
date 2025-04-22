@@ -1,4 +1,3 @@
-import os
 import requests
 import streamlit as st
 
@@ -9,26 +8,34 @@ def summarize_policy(text):
         return "❌ API key missing."
 
     headers = {
-        "Authorization": f"Bearer ",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
     }
 
     prompt = f"""
-A company uploaded this privacy policy:
+Aşağıdaki metin bir şirketin gizlilik politikasıdır:
 
 {text}
 
-Summarize it clearly in Turkish. Highlight key points. Then give bullet-pointed suggestions to make it more compliant with KVKK and GDPR.
+Bu politikayı basit ve maddeler halinde Türkçe olarak özetle.
+Ayrıca hangi alanlarda eksik ya da geliştirilmesi gerektiğini de öner.
 """
 
     data = {
         "model": "anthropic/claude-3-sonnet-20240229",
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
         "stream": False
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=data,
+            timeout=30
+        )
         response.raise_for_status()
         result = response.json()
         return result["choices"][0]["message"]["content"]
