@@ -99,10 +99,10 @@ st.subheader("💬 KVKK/GDPR Chatbot")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "system", "content": "You are a legal assistant specialized in Turkish KVKK and GDPR. Respond in formal Turkish with legal clarity and bullet points when needed."}
+        {"role": "system", "content": "You are a legal assistant specialized in Turkish KVKK and GDPR. Respond clearly in Turkish or English depending on the user's question. Use bullet points when needed."}
     ]
 
-user_input = st.chat_input("Bir KVKK veya GDPR sorusu sorun...")
+user_input = st.chat_input("Ask a KVKK or GDPR question in English or Turkish...")
 
 if user_input:
     with st.chat_message("user"):
@@ -111,27 +111,6 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Yanıt hazırlanıyor..."):
-            answer = ask_chatbot(st.session_state.chat_history)
-            st.markdown(answer)
-    st.session_state.chat_history.append({"role": "assistant", "content": answer})
-
-st.markdown("---")
-st.subheader("💬 KVKK/GDPR Chatbot")
-
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = [
-        {"role": "system", "content": "You are a legal assistant specialized in Turkish KVKK and EU GDPR. Respond clearly in either Turkish or English depending on the user's question. Use bullet points when needed."}
-    ]
-
-user_input = st.chat_input("Ask about KVKK or GDPR in Turkish or English...")
-
-if user_input:
-    with st.chat_message("user"):
-        st.markdown(user_input)
-    st.session_state.chat_history.append({"role": "user", "content": user_input})
-
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
             answer = ask_chatbot(st.session_state.chat_history)
             st.markdown(answer)
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
