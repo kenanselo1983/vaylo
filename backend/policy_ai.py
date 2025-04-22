@@ -22,21 +22,20 @@ Ayrıca hangi alanlarda eksik ya da geliştirilmesi gerektiğini de öner.
 
     data = {
         "model": "mistral/mistral-7b-instruct",
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "stream": False
+        "prompt": prompt,
+        "max_tokens": 512,
+        "temperature": 0.7
     }
 
     try:
         response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
+            "https://openrouter.ai/api/v1/completions",
             headers=headers,
             json=data,
             timeout=30
         )
         response.raise_for_status()
         result = response.json()
-        return result["choices"][0]["message"]["content"]
+        return result["choices"][0]["text"]
     except Exception as e:
-        return f"❌ GPT Error: {str(e)}"
+        return f"❌ GPT Error (completion fallback): {str(e)}"
