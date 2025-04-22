@@ -15,7 +15,7 @@ def evaluate_data(data, rules):
 
             elif rule['id'] == "kvkk_002":
                 created_at_raw = entry.get("created_at")
-                if created_at_raw:
+                if isinstance(created_at_raw, str) and created_at_raw.strip():
                     try:
                         created_at = datetime.strptime(created_at_raw, "%Y-%m-%d")
                         if created_at < datetime.now() - timedelta(days=730):
