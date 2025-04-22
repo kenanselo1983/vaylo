@@ -8,6 +8,7 @@ from backend.law_watcher import summarize
 from backend.scraper import fetch_kvkk_updates
 from backend.chatbot import ask_chatbot
 from backend.suggestions import suggest_fixes
+from backend.risk import calculate_risk_score, explain_risk_with_ai
 
 USERS = {"1": "1"}
 
@@ -66,6 +67,15 @@ if records:
     gdpr = load_rules("backend/rules/gdpr_rules.json")
     rules = kvkk + gdpr
     results = evaluate_data(records, rules)
+
+    score = calculate_risk_score(results)
+    color = "🟢" if score >= 80 else "🟡" if score >= 50 else "🔴"
+    st.subheader(f"🧮 Risk Score: {score}/100 {color}")
+
+    if st.button("🧠 Explain Risk Score"):
+        with st.spinner("Generating explanation..."):
+            explanation = explain_risk_with_ai(score, results)
+            st.text_area("📋 Risk Summary", explanation, height=300)
 
     st.subheader("🔍 Violations")
     if results:
