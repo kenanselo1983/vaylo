@@ -6,6 +6,7 @@ from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_html_report
 from backend.law_watcher import summarize
 from backend.scraper import fetch_kvkk_updates
+from backend.chatbot import ask_chatbot
 
 USERS = {"1": "1"}
 
@@ -92,3 +93,21 @@ if st.button("Fetch KVKK Summary"):
         summary = summarize(text)
         st.success("✅ AI summary complete")
         st.text_area("📄 Summary", summary, height=300)
+
+st.markdown("---")
+st.subheader("💬 KVKK/GDPR Chatbot")
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = [
+        {"role": "system", "content": "You are a legal assistant specialized in Turkish KVKK and EU GDPR. Respond formally, clearly, and accurately in Turkish."}
+    ]
+
+user_input = st.chat_input("Bir KVKK veya GDPR sorusu sorun...")
+if user_input:
+    st.session_state.chat_history.append({"role": "user", "content": user_input})
+    answer = ask_chatbot(st.session_state.chat_history)
+    st.session_state.chat_history.append({"role": "assistant", "content": answer})
+
+for msg in st.session_state.chat_history[1:]:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
