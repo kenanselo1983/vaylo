@@ -13,7 +13,7 @@ def summarize(text):
     }
 
     payload = {
-        "model": "mistral/mistral-7b-instruct",
+        "model": "openai/gpt-3.5-turbo",
         "messages": [
             {"role": "system", "content": "Summarize this Turkish legal policy into simple bullet points."},
             {"role": "user", "content": text}

@@ -13,7 +13,7 @@ def ask_chatbot(context, question):
     }
 
     payload = {
-        "model": "mistral/mistral-7b-instruct",
+        "model": "openai/gpt-3.5-turbo",
         "messages": [
             {"role": "system", "content": context},
             {"role": "user", "content": question}
