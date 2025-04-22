@@ -47,7 +47,12 @@ st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
 
 # -------- DATA SOURCE OPTIONS --------
-option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database", "Load from Google Sheet"])
+option = st.radio("Choose data source:", [
+    "Upload CSV",
+    "Scan Local Database",
+    "Load from Google Sheet"
+])
+
 records = []
 
 if option == "Upload CSV":
