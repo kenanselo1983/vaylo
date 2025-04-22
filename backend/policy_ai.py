@@ -1,6 +1,5 @@
 import requests
 
-# ✅ Use your actual key here (copy-paste with NO SPACES)
 OPENROUTER_API_KEY = "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"
 
 def summarize_policy(text):
@@ -22,7 +21,7 @@ Ayrıca hangi alanlarda eksik ya da geliştirilmesi gerektiğini de öner.
 """
 
     data = {
-        "model": "openai/gpt-3.5-turbo",  # ✅ SAFE fallback model
+        "model": "meta-llama/llama-2-70b-chat",
         "messages": [
             {"role": "user", "content": prompt}
         ],
