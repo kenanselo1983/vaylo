@@ -20,7 +20,13 @@ def summarize(text):
         ]
     }
 
-    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-    response.raise_for_status()
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"]
 
-    return response.json()["choices"][0]["message"]["content"]
+    except requests.exceptions.HTTPError as e:
+        return f"❌ GPT Error: {e.response.status_code} - {e.response.text}"
+
+    except Exception as e:
+        return f"❌ Unexpected Error: {str(e)}"
