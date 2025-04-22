@@ -20,9 +20,10 @@ def evaluate_data(data, rules):
             elif rule['id'] == "kvkk_002":
                 created_at_raw = entry.get("created_at")
 
-                if created_at_raw is not None:
+                # Check that created_at exists and is a string
+                if created_at_raw and isinstance(created_at_raw, str):
                     try:
-                        created_at = datetime.strptime(str(created_at_raw), "%Y-%m-%d")
+                        created_at = datetime.strptime(created_at_raw.strip(), "%Y-%m-%d")
                         if created_at < datetime.now() - timedelta(days=730):
                             violations.append({
                                 "rule": rule['name'],
@@ -34,7 +35,7 @@ def evaluate_data(data, rules):
                             "rule": rule['name'],
                             "field": "created_at",
                             "record": entry,
-                            "error": f"Invalid date: {created_at_raw} ({e})"
+                            "error": f"Invalid date format: {created_at_raw}"
                         })
 
             elif rule['id'] == "gdpr_001":
