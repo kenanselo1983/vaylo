@@ -1,1 +1,0 @@
-# Rule logic for KVKK & GDPR

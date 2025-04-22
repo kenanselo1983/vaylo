@@ -1,6 +1,0 @@
-openai
-fastapi
-streamlit
-sqlalchemy
-python-dotenv
-requests
