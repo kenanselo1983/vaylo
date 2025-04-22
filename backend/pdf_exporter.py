@@ -1,15 +1,25 @@
-from fpdf import FPDF
+import datetime
 
-def generate_pdf_report(violations):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Helvetica", size=12)
+def generate_html_report(violations):
+    today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    pdf.cell(0, 10, "Vaylo – Compliance Violations Report", ln=1, align="C")
-    pdf.ln(10)
+    html = f"""
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; padding: 20px; }}
+            h1 {{ color: #333; }}
+            .violation {{ border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }}
+            .no-violations {{ font-weight: bold; color: green; }}
+        </style>
+    </head>
+    <body>
+        <h1>Vaylo – Compliance Violations Report</h1>
+        <p><strong>Generated:</strong> {today}</p>
+    """
 
     if not violations:
-        pdf.multi_cell(0, 10, "No violations found in this data.")
+        html += "<p class='no-violations'>🎉 No violations found in this data.</p>"
     else:
         for v in violations:
             rule = v.get("rule", "-")
@@ -17,11 +27,14 @@ def generate_pdf_report(violations):
             name = v.get("record", {}).get("name", "-")
             error = v.get("error", "N/A")
 
-            pdf.multi_cell(0, 10, f"""Rule   : {rule}
-Field  : {field}
-Name   : {name}
-Error  : {error}
----""")
-            pdf.ln(2)
+            html += f"""
+            <div class="violation">
+                <strong>Rule:</strong> {rule}<br>
+                <strong>Field:</strong> {field}<br>
+                <strong>Name:</strong> {name}<br>
+                <strong>Error:</strong> {error}
+            </div>
+            """
 
-    return pdf.output(dest="S").encode("latin-1", "ignore")
+    html += "</body></html>"
+    return html.encode("utf-8")
