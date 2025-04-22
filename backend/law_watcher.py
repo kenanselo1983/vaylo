@@ -1,32 +1,25 @@
 import requests
-import os
+import streamlit as st
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY")
+
+if not OPENROUTER_API_KEY:
+    raise ValueError("❌ GPT Error: API key missing. Please check your Streamlit secrets.")
 
 def summarize(text):
-    if not API_KEY:
-        return "❌ API key missing."
-
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    data = {
-        "model": "openai/gpt-3.5-turbo",
+    payload = {
+        "model": "mistral/mistral-7b-instruct",
         "messages": [
-            {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
+            {"role": "system", "content": "Summarize this Turkish legal policy into simple bullet points."},
             {"role": "user", "content": text}
         ]
     }
 
-    try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-        response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
-
-    except requests.exceptions.HTTPError as e:
-        return f"❌ GPT Error: {e.response.status_code} - {e.response.text}"
-
-    except Exception as e:
-        return f"❌ Unexpected Error: {str(e)}"
+    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+    response.raise_for_status()
+    return response.json()["choices"][0]["message"]["content"]
