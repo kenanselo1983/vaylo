@@ -3,10 +3,7 @@ import pandas as pd
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_pdf_report
- HEAD
-=======
 from backend.law_watcher import fetch_kvkk_updates, summarize
-d61fd10 (initial Vaylo MVP)
 
 # --- Mock user database ---
 USERS = {
@@ -17,10 +14,8 @@ USERS = {
 
 def login():
     st.title("🔐 Vaylo Login")
-
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
-
     if st.button("Login"):
         if email in USERS and USERS[email] == password:
             st.session_state.logged_in = True
@@ -34,7 +29,6 @@ def logout():
     st.session_state.user = None
     st.experimental_rerun()
 
-# --- Session Setup ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.user = None
@@ -43,7 +37,6 @@ if not st.session_state.logged_in:
     login()
     st.stop()
 
-# --- Main App ---
 st.title("📋 Vaylo – Compliance Scanner")
 st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
@@ -80,7 +73,7 @@ if records:
 
         csv = df_results.to_csv(index=False).encode("utf-8")
         st.download_button(
-            label="📥 Download Violations Report (CSV)",
+            label="�� Download Violations Report (CSV)",
             data=csv,
             file_name="vaylo_violations_report.csv",
             mime="text/csv",
