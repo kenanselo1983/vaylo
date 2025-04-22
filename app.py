@@ -5,22 +5,19 @@ from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_pdf_report
 from backend.law_watcher import fetch_kvkk_updates, summarize
 
-USERS = {
-    "admin@example.com": "admin123",
-    "legal@company.com": "legalpass",
-    "test@vaylo.ai": "test"
-}
+# --- Only user: 1 / 1 ---
+USERS = {"1": "1"}
 
 def login():
     st.title("🔐 Vaylo Login")
     with st.form("login_form"):
-        email = st.text_input("Email")
+        username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         submitted = st.form_submit_button("Login")
         if submitted:
-            if email in USERS and USERS[email] == password:
+            if username in USERS and USERS[username] == password:
                 st.session_state.logged_in = True
-                st.session_state.user = email
+                st.session_state.user = username
                 st.rerun()
             else:
                 st.error("❌ Invalid credentials")
