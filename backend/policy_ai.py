@@ -21,7 +21,7 @@ Ayrıca hangi alanlarda eksik ya da geliştirilmesi gerektiğini de öner.
 """
 
     data = {
-        "model": "meta-llama/llama-2-70b-chat",
+        "model": "mistral/mistral-7b-instruct",
         "messages": [
             {"role": "user", "content": prompt}
         ],
