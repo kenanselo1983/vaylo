@@ -11,6 +11,7 @@ from backend.suggestions import suggest_fixes
 from backend.risk import calculate_risk_score, explain_risk_with_ai
 from backend.doc_reader import extract_text_from_docx, extract_text_from_txt
 from backend.policy_ai import summarize_policy
+from backend.google_loader import load_google_sheet
 
 USERS = {"1": "1"}
 
@@ -45,7 +46,8 @@ st.title("📋 Vaylo – Compliance Scanner")
 st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
 
-option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database"])
+# -------- DATA SOURCE OPTIONS --------
+option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database", "Load from Google Sheet"])
 records = []
 
 if option == "Upload CSV":
@@ -64,6 +66,17 @@ elif option == "Scan Local Database":
     except Exception as e:
         st.error(f"Error fetching data: {e}")
 
+elif option == "Load from Google Sheet":
+    sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/1yIQNKxOWv0RqpBzTnXOVCIm1yEhrVKXuj1scV_lWjzg/edit?usp=sharing")
+    if st.button("🔄 Load Data"):
+        records = load_google_sheet(sheet_url)
+        if records:
+            st.success(f"✅ Loaded {len(records)} records from Google Sheet.")
+            st.dataframe(pd.DataFrame(records))
+        else:
+            st.error("❌ Could not load data. Check the sheet URL.")
+
+# -------- SCANNING --------
 if records:
     kvkk = load_rules("backend/rules/kvkk_rules.json")
     gdpr = load_rules("backend/rules/gdpr_rules.json")
@@ -75,9 +88,8 @@ if records:
     st.subheader(f"🧮 Risk Score: {score}/100 {color}")
 
     if st.button("🧠 Explain Risk Score"):
-        with st.spinner("Generating explanation..."):
-            explanation = explain_risk_with_ai(score, results)
-            st.text_area("📋 Risk Summary", explanation, height=300)
+        explanation = explain_risk_with_ai(score, results)
+        st.text_area("📋 Risk Summary", explanation, height=300)
 
     st.subheader("🔍 Violations")
     if results:
@@ -85,10 +97,8 @@ if records:
         st.dataframe(df_results)
 
         if st.button("💡 Suggest Compliance Improvements"):
-            with st.spinner("Analyzing violations..."):
-                suggestions = suggest_fixes(results)
-                st.success("✅ Suggestions ready:")
-                st.text_area("🧠 AI Suggestions", suggestions, height=300)
+            suggestions = suggest_fixes(results)
+            st.text_area("🧠 AI Suggestions", suggestions, height=300)
 
         html_data = generate_html_report(results)
         st.subheader("🧾 Compliance Report (HTML View)")
@@ -102,6 +112,7 @@ if records:
     else:
         st.success("🎉 No violations found!")
 
+# -------- POLICY AI --------
 st.markdown("---")
 st.subheader("📄 Upload Privacy Policy (.docx or .txt)")
 
@@ -121,6 +132,7 @@ if uploaded_policy:
             st.success("✅ Summary and suggestions ready:")
             st.text_area("📋 Policy AI Output", result, height=300)
 
+# -------- KVKK UPDATE --------
 st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (AI-Powered)")
 
@@ -132,6 +144,7 @@ if st.button("Fetch KVKK Summary"):
         st.success("✅ AI summary complete")
         st.text_area("📄 Summary", summary, height=300)
 
+# -------- CHATBOT --------
 st.markdown("---")
 st.subheader("💬 KVKK/GDPR Chatbot")
 
@@ -145,13 +158,10 @@ user_input = st.chat_input("Ask a KVKK or GDPR question in English or Turkish...
 if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
-
     st.session_state.chat_history.append({"role": "user", "content": user_input})
 
     with st.chat_message("assistant"):
         with st.spinner("Yanıt hazırlanıyor..."):
-            context = "You are a legal assistant specialized in Turkish KVKK and GDPR."
-            answer = ask_chatbot(context, user_input)
+            answer = ask_chatbot(st.session_state.chat_history)
             st.markdown(answer)
-
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
