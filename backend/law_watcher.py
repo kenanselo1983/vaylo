@@ -14,7 +14,7 @@ def summarize(text):
     }
 
     data = {
-        "model": "mistral/mixtral-8x7b-instruct",
+        "model": "mistralai/mixtral-8x7b",  # ✅ correct model name
         "messages": [
             {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
             {"role": "user", "content": text}
