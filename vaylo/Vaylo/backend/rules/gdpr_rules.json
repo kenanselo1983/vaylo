@@ -1,0 +1,10 @@
+[
+  {
+    "id": "gdpr_001",
+    "name": "No Legal Basis",
+    "description": "Detects records with no legal basis.",
+    "field_check": ["legal_basis"],
+    "violation_condition": "legal_basis is null",
+    "severity": "high"
+  }
+]
