@@ -1,35 +1,26 @@
-import os
 import requests
-import streamlit as st
+import os
 
-OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 def summarize(text):
-    if not OPENROUTER_API_KEY:
-        return "❌ API key missing. Please check your Streamlit secrets."
+    if not API_KEY:
+        return "❌ API key missing."
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
 
     data = {
-        "model": "anthropic/claude-3-sonnet-20240229",
+        "model": "openai/gpt-3.5-turbo",
         "messages": [
-            {"role": "user", "content": "Summarize the following Turkish legal document in simple bullet points:\n\n" + text}
-        ],
-        "stream": False
+            {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
+            {"role": "user", "content": text}
+        ]
     }
 
-    try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=data,
-            timeout=30
-        )
-        response.raise_for_status()
-        result = response.json()
-        return result["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"❌ Error from AI: {str(e)}"
+    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+    response.raise_for_status()
+
+    return response.json()["choices"][0]["message"]["content"]

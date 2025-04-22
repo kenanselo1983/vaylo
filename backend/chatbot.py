@@ -1,28 +1,26 @@
-import os
 import requests
-import streamlit as st
+import os
 
-OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-def ask_chatbot(messages):
-    if not OPENROUTER_API_KEY:
-        return "❌ API key missing."
+def ask_chatbot(context, question):
+    if not API_KEY:
+        raise Exception("❌ API key missing.")
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
 
     data = {
-        "model": "anthropic/claude-3-sonnet-20240229",
-        "messages": messages,
-        "stream": False
+        "model": "openai/gpt-3.5-turbo",
+        "messages": [
+            {"role": "system", "content": f"You are a compliance assistant. This is the policy:\n{context}"},
+            {"role": "user", "content": question}
+        ]
     }
 
-    try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data, timeout=30)
-        response.raise_for_status()
-        result = response.json()
-        return result["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"❌ Chatbot Error: {str(e)}"
+    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+    response.raise_for_status()
+
+    return response.json()["choices"][0]["message"]["content"]
