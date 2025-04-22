@@ -1,19 +1,15 @@
 from fpdf import FPDF
-import os
-
-FONT_PATH = os.path.join("backend", "fonts", "DejaVuSans.ttf")
 
 def generate_pdf_report(violations):
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font("DejaVu", "", FONT_PATH, uni=True)
-    pdf.set_font("DejaVu", size=12)
+    pdf.set_font("Helvetica", size=12)
 
     pdf.cell(0, 10, "Vaylo – Compliance Violations Report", ln=1, align="C")
     pdf.ln(10)
 
     if not violations:
-        pdf.multi_cell(0, 10, "🎉 No violations found in this data.")
+        pdf.multi_cell(0, 10, "No violations found in this data.")
     else:
         for v in violations:
             rule = v.get("rule", "-")
