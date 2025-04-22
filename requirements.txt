@@ -1,2 +1,5 @@
-streamlit==1.31.1
+streamlit
 pandas
+fpdf
+beautifulsoup4
+requests
