@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
+import streamlit.components.v1 as components
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
-from backend.pdf_exporter import generate_pdf_report
+from backend.pdf_exporter import generate_html_report
 from backend.law_watcher import fetch_kvkk_updates, summarize
 
-# --- Only user: 1 / 1 ---
+# --- Basic login ---
 USERS = {"1": "1"}
 
 def login():
@@ -68,24 +69,21 @@ if records:
     if results:
         df_results = pd.DataFrame(results)
         st.dataframe(df_results)
-
-        csv = df_results.to_csv(index=False).encode("utf-8")
-        st.download_button(
-            label="📥 Download Violations Report (CSV)",
-            data=csv,
-            file_name="vaylo_violations_report.csv",
-            mime="text/csv",
-        )
-
-        pdf_data = generate_pdf_report(results)
-        st.download_button(
-            label="📄 Download PDF Report",
-            data=pdf_data,
-            file_name="vaylo_report.pdf",
-            mime="application/pdf",
-        )
     else:
         st.success("🎉 No violations found!")
+
+    # Generate and show HTML report
+    html_data = generate_html_report(results)
+    st.subheader("🧾 Compliance Report (HTML View)")
+    components.html(html_data.decode("utf-8"), height=600, scrolling=True)
+
+    # Allow download
+    st.download_button(
+        label="💾 Download HTML Report",
+        data=html_data,
+        file_name="vaylo_report.html",
+        mime="text/html",
+    )
 
 st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (Mock)")
