@@ -19,4 +19,4 @@ def generate_pdf_report(violations):
         )
         pdf.ln(2)
 
-    return bytes(pdf.output(dest="S"))
+    return pdf.output(dest="S")
