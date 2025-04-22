@@ -3,9 +3,50 @@ import pandas as pd
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_pdf_report
+ HEAD
+=======
+from backend.law_watcher import fetch_kvkk_updates, summarize
+d61fd10 (initial Vaylo MVP)
 
-st.set_page_config(page_title="Vaylo", layout="wide")
+# --- Mock user database ---
+USERS = {
+    "admin@example.com": "admin123",
+    "legal@company.com": "legalpass",
+    "test@vaylo.ai": "test"
+}
+
+def login():
+    st.title("🔐 Vaylo Login")
+
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if email in USERS and USERS[email] == password:
+            st.session_state.logged_in = True
+            st.session_state.user = email
+            st.experimental_rerun()
+        else:
+            st.error("❌ Invalid credentials")
+
+def logout():
+    st.session_state.logged_in = False
+    st.session_state.user = None
+    st.experimental_rerun()
+
+# --- Session Setup ---
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.user = None
+
+if not st.session_state.logged_in:
+    login()
+    st.stop()
+
+# --- Main App ---
 st.title("📋 Vaylo – Compliance Scanner")
+st.caption(f"👤 Logged in as: {st.session_state.user}")
+st.button("Logout", on_click=logout)
 
 option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database"])
 records = []
@@ -54,3 +95,13 @@ if records:
         )
     else:
         st.success("🎉 No violations found!")
+
+st.markdown("---")
+st.subheader("🧠 KVKK Update Summary (Mock)")
+
+if st.button("Fetch KVKK Summary"):
+    with st.spinner("Fetching and summarizing KVKK page..."):
+        content = fetch_kvkk_updates()
+        summary = summarize(content)
+        st.success("Done!")
+        st.text_area("📝 GPT Summary:", summary, height=200)
