@@ -14,11 +14,12 @@ def summarize(text):
     }
 
     data = {
-        "model": "mistralai/mixtral-8x7b",  # ✅ correct model name
+        "model": "openai/gpt-3.5-turbo",  # ✅ known working model
         "messages": [
             {"role": "system", "content": "Summarize the following Turkish legal document in simple bullet points."},
             {"role": "user", "content": text}
-        ]
+        ],
+        "stream": False
     }
 
     try:
