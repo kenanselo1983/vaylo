@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "../../users.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'users.db')
 
 def register_user(username, password, role, workspace):
     conn = sqlite3.connect(DB_PATH)
