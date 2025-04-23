@@ -35,6 +35,50 @@ if not st.session_state.logged_in:
     login_ui()
     st.stop()
 
+    from datetime import datetime, timedelta
+
+st.sidebar.markdown("### ⚙️ Auto Scan Settings")
+
+
+from datetime import datetime
+
+records = []
+
+def should_scan():
+    last = st.session_state.scan_settings["last_scanned"]
+    if not last:
+        return True
+    return datetime.now() >= datetime.strptime(last, "%Y-%m-%d") + timedelta(days=st.session_state.scan_settings["interval_days"])
+
+if st.session_state.get("trigger_manual_scan") or should_scan():
+    try:
+        df = load_google_sheet(st.session_state.scan_settings["url"])
+        st.success(f"✅ Auto-loaded {len(df)} rows from Google Sheets.")
+        st.dataframe(df)
+        records = df.to_dict(orient="records")
+        st.session_state.scan_settings["last_scanned"] = datetime.now().strftime("%Y-%m-%d")
+        st.session_state.trigger_manual_scan = False
+    except Exception as e:
+        st.error(f"❌ Auto scan failed: {e}")
+
+
+# Store values in session or provide defaults
+if "scan_settings" not in st.session_state:
+    st.session_state.scan_settings = {
+        "url": "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv",
+        "interval_days": 2,
+        "last_scanned": None
+    }
+
+st.session_state.scan_settings["url"] = st.sidebar.text_input("📄 Google Sheet URL", value=st.session_state.scan_settings["url"])
+st.session_state.scan_settings["interval_days"] = st.sidebar.number_input("📅 Scan every X days", min_value=1, value=st.session_state.scan_settings["interval_days"])
+st.sidebar.write(f"🕒 Last scan: {st.session_state.scan_settings['last_scanned'] or 'Never'}")
+
+# Manual trigger
+if st.sidebar.button("🔄 Run Compliance Scan Now"):
+    st.session_state.trigger_manual_scan = True
+
+
 # --- UI ---
 st.set_page_config(page_title="Vaylo Compliance Scanner", layout="wide")
 st.title("📋 Vaylo – Compliance Scanner")
