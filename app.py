@@ -73,7 +73,7 @@ elif option == "Scan Local Database":
         st.error(f"Error fetching data: {e}")
 
 elif option == "Load from Google Sheet":
-    sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/1yIQNKxOWv0RqpBzTnXOVCIm1yEhrVKXuj1scV_lWjzg/edit?usp=sharing")
+sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv")
     if st.button("🔄 Load Data"):
         records = load_google_sheet(sheet_url)
         if records:
