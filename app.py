@@ -72,15 +72,20 @@ elif option == "Scan Local Database":
     except Exception as e:
         st.error(f"Error fetching data: {e}")
 
-elif option == "Load from Google Sheet":
-    sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/1yIQNKxOWv0RqpBzTnXOVCIm1yEhrVKXuj1scV_lWjzg/edit?usp=sharing")
-    if st.button("🔄 Load Data"):
-        records = load_google_sheet(sheet_url)
-        if records:
-            st.success(f"✅ Loaded {len(records)} records from Google Sheet.")
-            st.dataframe(pd.DataFrame(records))
-        else:
-            st.error("❌ Could not load data. Check the sheet URL.")
+elif option == "Google Sheets":
+    st.subheader("📄 Load Data from Google Sheets")
+    st.info("Make sure the Google Sheet is published and the link ends in `/gviz/tq?tqx=out:csv`")
+
+    sheet_url = st.text_input("Paste Google Sheet CSV URL", value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv")
+    
+    if sheet_url:
+        try:
+            df = pd.read_csv(sheet_url)
+            st.success(f"✅ Loaded {len(df)} rows from Google Sheets.")
+            st.dataframe(df)
+            records = df.to_dict(orient="records")
+        except Exception as e:
+            st.error(f"❌ Could not load data from Google Sheets.\n\n**{type(e).__name__}:** {e}")
 
 # -------- SCANNING --------
 if records:
