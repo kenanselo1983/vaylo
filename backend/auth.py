@@ -1,7 +1,22 @@
 import sqlite3
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "../../users.db")
+
+def register_user(username, password, role, workspace):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO users (username, password, role, workspace) VALUES (?, ?, ?, ?)", (username, password, role, workspace))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
 
 def authenticate_user(username, password, workspace):
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT role FROM users WHERE username=? AND password=? AND workspace=?", (username, password, workspace))
     result = c.fetchone()
@@ -10,25 +25,10 @@ def authenticate_user(username, password, workspace):
         return True, result[0]
     return False, None
 
-def register_user(username, password, role, workspace, first_name, last_name, email, phone):
-    conn = sqlite3.connect("users.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=?", (username,))
-    if c.fetchone():
-        conn.close()
-        return False  # User already exists
-    c.execute('''
-        INSERT INTO users (username, password, role, workspace, first_name, last_name, email, phone)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (username, password, role, workspace, first_name, last_name, email, phone))
-    conn.commit()
-    conn.close()
-    return True
-
 def get_all_users():
-    conn = sqlite3.connect("users.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT username, role, workspace, first_name, last_name, email, phone FROM users")
+    c.execute("SELECT username, role, workspace FROM users")
     users = c.fetchall()
     conn.close()
     return users
