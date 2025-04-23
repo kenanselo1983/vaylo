@@ -1,18 +1,45 @@
 [
   {
-    "id": "kvkk_001",
-    "name": "Missing Consent",
-    "description": "Checks if personal data is stored without valid consent.",
-    "field_check": ["consent_status"],
-    "violation_condition": "consent_status != 'given'",
-    "severity": "high"
+    "id": "rule_001",
+    "field": "purpose",
+    "condition": "equals",
+    "value": "Marketing",
+    "violation_if": {
+      "field": "data_accessed",
+      "condition": "equals",
+      "value": "Medical Records"
+    },
+    "message": "❌ Marketing should not access Medical Records"
   },
   {
-    "id": "kvkk_002",
-    "name": "Expired Data Retention",
-    "description": "Flags data that exceeds 2 years.",
-    "field_check": ["created_at"],
-    "violation_condition": "created_at older than 730 days",
-    "severity": "medium"
+    "id": "rule_002",
+    "field": "purpose",
+    "condition": "equals",
+    "value": "Customer Support",
+    "violation_if": {
+      "field": "data_accessed",
+      "condition": "equals",
+      "value": "Payroll"
+    },
+    "message": "❌ Customer Support should not access Payroll"
+  },
+  {
+    "id": "rule_003",
+    "field": "purpose",
+    "condition": "equals",
+    "value": "Internal Audit",
+    "violation_if": {
+      "field": "data_accessed",
+      "condition": "not_in",
+      "value": ["HR Files", "Usage Logs"]
+    },
+    "message": "❌ Internal Audit should only access HR Files or Usage Logs"
+  },
+  {
+    "id": "rule_004",
+    "field": "access_time",
+    "condition": "older_than_days",
+    "value": 30,
+    "message": "❌ Accessed data more than 30 days ago"
   }
 ]

@@ -1,27 +1,39 @@
 import sqlite3
+import random
+from faker import Faker
+from datetime import datetime, timedelta
 
-print("Creating database...")
+faker = Faker()
+purposes = ["Internal Audit", "Marketing", "Legal", "Research", "Customer Support"]
+data_types = ["Customer Financial Info", "Medical Records", "HR Files", "Payroll", "Usage Logs"]
 
 conn = sqlite3.connect("company_data.db")
-cursor = conn.cursor()
+c = conn.cursor()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS clients (
-    name TEXT,
+c.execute("DROP TABLE IF EXISTS company_records")
+
+c.execute("""
+CREATE TABLE company_records (
+    employee_id TEXT,
+    full_name TEXT,
     email TEXT,
-    created_at TEXT,
-    consent_status TEXT,
-    legal_basis TEXT
+    data_accessed TEXT,
+    access_time TEXT,
+    purpose TEXT
 )
 """)
 
-sample_data = [
-    ("Ali Yılmaz", "ali@example.com", "2021-01-01", "not_given", None),
-    ("Ayşe Kaya", "ayse@example.com", "2023-01-01", "given", "contract")
-]
+for _ in range(100):
+    employee_id = f"E{random.randint(1000, 9999)}"
+    full_name = faker.name()
+    email = faker.email()
+    data_accessed = random.choice(data_types)
+    access_time = (datetime.now() - timedelta(days=random.randint(0, 60))).strftime("%Y-%m-%d")
+    purpose = random.choice(purposes)
 
-cursor.executemany("INSERT INTO clients VALUES (?, ?, ?, ?, ?)", sample_data)
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", 
+              (employee_id, full_name, email, data_accessed, access_time, purpose))
+
 conn.commit()
 conn.close()
-
-print("✅ Done: company_data.db created.")
+print("✅ company_data.db created with 100 records.")
