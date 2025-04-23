@@ -17,6 +17,9 @@ from backend.google_loader import load_google_sheet
 from backend.login import login, logout
 from backend.login import login
 
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.user = None
 
 st.markdown(f"👤 Logged in as: `{st.session_state.user}`")
 st.button("🚪 Logout", on_click=logout)
