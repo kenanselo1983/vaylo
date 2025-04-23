@@ -23,5 +23,8 @@ def login_ui():
                 st.error("❌ Login failed. Check credentials or workspace code.")
 
 def logout():
-    st.session_state.clear()
-    st.rerun()
+    st.session_state.logged_in = False
+    st.session_state.username = None
+    st.session_state.role = None
+    st.session_state.workspace = None
+    st.session_state.logout_triggered = True  # 🔁 trigger rerun

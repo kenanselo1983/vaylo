@@ -18,6 +18,12 @@ from backend.google_loader import load_google_sheet
 from backend.login import login_ui, logout
 from admin_panel import admin_panel
 
+# 🔁 Handle logout rerun
+if st.session_state.get("logout_triggered"):
+    st.session_state.logout_triggered = False  # reset the trigger
+    st.rerun()
+
+
 # --- Login Check ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
