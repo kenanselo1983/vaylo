@@ -74,10 +74,13 @@ elif option == "Scan Local Database":
 
 elif option == "Google Sheets":
     st.subheader("📄 Load Data from Google Sheets")
-    st.info("Make sure the Google Sheet is published and the link ends in `/gviz/tq?tqx=out:csv`")
+    st.info("✅ Make sure the sheet is public and ends with `/gviz/tq?tqx=out:csv`")
 
-    sheet_url = st.text_input("Paste Google Sheet CSV URL", value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv")
-    
+    sheet_url = st.text_input(
+        "Paste your Google Sheets CSV link",
+        value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+    )
+
     if sheet_url:
         try:
             df = pd.read_csv(sheet_url)
@@ -85,7 +88,7 @@ elif option == "Google Sheets":
             st.dataframe(df)
             records = df.to_dict(orient="records")
         except Exception as e:
-            st.error(f"❌ Could not load data from Google Sheets.\n\n**{type(e).__name__}:** {e}")
+            st.error(f"❌ Could not load data.\n\n**{type(e).__name__}:** {e}")
 
 # -------- SCANNING --------
 if records:
