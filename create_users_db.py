@@ -1,6 +1,8 @@
 import sqlite3
+
 conn = sqlite3.connect("users.db")
 c = conn.cursor()
+
 c.execute('''
 CREATE TABLE IF NOT EXISTS users (
     username TEXT PRIMARY KEY,
@@ -13,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone TEXT
 )
 ''')
+
 conn.commit()
 conn.close()
-print("✅ users.db created.")
+print("✅ users.db created successfully.")
