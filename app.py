@@ -73,22 +73,16 @@ elif option == "Scan Local Database":
         st.error(f"Error fetching data: {e}")
 
 elif option == "Google Sheets":
+    st.write("🧪 Google Sheets option selected, trying to load...")
     sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv")
-    try:
-        df = pd.read_csv(sheet_url)
-        st.success(f"Loaded {len(df)} records from Google Sheets.")
-        st.dataframe(df)
-        records = df.to_dict(orient="records")
-    except Exception as e:
-        st.error(f"❌ Could not load data. Check the sheet URL.\n\n{e}")
-    if st.button("🔄 Load Data"):
-        records = load_google_sheet(sheet_url)
-        if records:
-            st.success(f"✅ Loaded {len(records)} records from Google Sheet.")
-            st.dataframe(pd.DataFrame(records))
-        else:
-            st.error("❌ Could not load data. Check the sheet URL.")
-
+    if sheet_url:
+        try:
+            df = pd.read_csv(sheet_url)
+            st.success(f"✅ Loaded {len(df)} rows from Google Sheets.")
+            st.dataframe(df)
+            records = df.to_dict(orient="records")
+        except Exception as e:
+            st.error(f"❌ Could not load data from Google Sheets.\n\n**{type(e).__name__}:** {e}")
 # -------- SCANNING --------
 if records:
     kvkk = load_rules("backend/rules/kvkk_rules.json")
