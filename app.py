@@ -14,7 +14,7 @@ from backend.risk import calculate_risk_score, explain_risk_with_ai
 from backend.doc_reader import extract_text_from_docx, extract_text_from_txt
 from backend.policy_ai import summarize_policy
 from backend.google_loader import load_google_sheet
-from backend.login import login_form
+from backend.login import login, logout
 from backend.login import login
 
 
