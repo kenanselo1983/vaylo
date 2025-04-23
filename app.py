@@ -14,7 +14,7 @@ from backend.risk import calculate_risk_score, explain_risk_with_ai
 from backend.doc_reader import extract_text_from_docx, extract_text_from_txt
 from backend.policy_ai import summarize_policy
 from backend.google_loader import load_google_sheet
-from backend.login import logout
+from backend.login import login_ui, logout
 from admin_panel import admin_panel
 
 # --- Login Check ---
@@ -25,7 +25,7 @@ if "logged_in" not in st.session_state:
     st.session_state.workspace = None
 
 if not st.session_state.logged_in:
-login_ui()
+    login_ui()
     st.stop()
 
 # --- UI ---
