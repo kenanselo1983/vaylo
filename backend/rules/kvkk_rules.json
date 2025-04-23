@@ -43,3 +43,24 @@
     "message": "❌ Data access is too old (over 30 days)"
   }
 ]
+
+[
+  {
+    "name": "Missing Consent",
+    "column": "legal_basis",
+    "type": "consent_check",
+    "description": "Check if user has not given consent"
+  },
+  {
+    "name": "Email Required",
+    "column": "legal_basis",
+    "type": "email_check",
+    "description": "Check if email is missing or invalid"
+  },
+  {
+    "name": "Missing Legal Basis Field",
+    "column": "legal_basis",
+    "type": "missing",
+    "description": "Legal basis data is missing"
+  }
+]

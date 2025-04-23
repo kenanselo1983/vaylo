@@ -1,48 +1,46 @@
 import json
-from datetime import datetime, timedelta
 
-def load_rules(path):
-    with open(path, 'r') as f:
-        return json.load(f)
+def evaluate_data(records, rules):
+    results = []
 
-def evaluate_data(data, rules):
-    violations = []
-
-    for entry in data:
+    for entry in records:
         for rule in rules:
-            if rule['id'] == "kvkk_001":
-                if entry.get("consent_status") != "given":
-                    violations.append({
-                        "rule": rule['name'],
-                        "field": "consent_status",
-                        "record": entry
+            column = rule["column"]
+            raw_value = entry.get(column)
+
+            # Try to parse JSON if value looks like JSON
+            parsed_value = {}
+            if isinstance(raw_value, str) and raw_value.strip().startswith("{"):
+                try:
+                    parsed_value = json.loads(raw_value)
+                except json.JSONDecodeError:
+                    pass
+
+            # Rule: missing field entirely
+            if rule["type"] == "missing" and not raw_value:
+                results.append({
+                    "rule": rule["name"],
+                    "column": column,
+                    "reason": "Field is missing or empty"
+                })
+
+            # Rule: consent_check
+            if rule["type"] == "consent_check":
+                if not parsed_value.get("consent_given", True):
+                    results.append({
+                        "rule": rule["name"],
+                        "column": column,
+                        "reason": "Consent not given"
                     })
 
-            elif rule['id'] == "kvkk_002":
-                created_at_raw = entry.get("created_at")
-                if created_at_raw and isinstance(created_at_raw, str):
-                    try:
-                        created_at = datetime.strptime(created_at_raw.strip(), "%Y-%m-%d")
-                        if created_at < datetime.now() - timedelta(days=730):
-                            violations.append({
-                                "rule": rule['name'],
-                                "field": "created_at",
-                                "record": entry
-                            })
-                    except Exception:
-                        violations.append({
-                            "rule": rule['name'],
-                            "field": "created_at",
-                            "record": entry,
-                            "error": "Invalid date format"
-                        })
-
-            elif rule['id'] == "gdpr_001":
-                if not entry.get("legal_basis"):
-                    violations.append({
-                        "rule": rule['name'],
-                        "field": "legal_basis",
-                        "record": entry
+            # Rule: email_check
+            if rule["type"] == "email_check":
+                email = parsed_value.get("email", "")
+                if not email or "@" not in email:
+                    results.append({
+                        "rule": rule["name"],
+                        "column": column,
+                        "reason": "Missing or invalid email"
                     })
 
-    return violations
+    return results
