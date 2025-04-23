@@ -48,6 +48,8 @@ st.button("Logout", on_click=logout)
 
 option = st.radio("Choose data source:", [
     st.write("Selected data source:", option)
+    st.warning(f"🧪 DEBUG: Option selected = {option}")
+
     "Upload CSV",
     "Scan Local Database",
     "Load from Google Sheet"
