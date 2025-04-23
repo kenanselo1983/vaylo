@@ -1,40 +1,29 @@
-""import streamlit as st
-import sqlite3
+import streamlit as st
 from backend.auth import register_user, get_all_users
 
 def admin_panel():
-    st.title("👑 Admin Panel – Manage Users")
-    st.subheader("➕ Create New User")
+    st.subheader("👑 Admin Panel – Manage Users")
 
-    with st.form("admin-user-form", clear_on_submit=True):
-        new_user = st.text_input("👤 Username")
-        new_pass = st.text_input("🔑 Password", type="password")
-        first_name = st.text_input("🧍 First Name")
-        last_name = st.text_input("👥 Last Name")
-        email = st.text_input("📧 Email")
-        phone = st.text_input("📞 Phone Number")
-        role = st.selectbox("🎓 Role", ["admin", "user"])
-        submitted = st.form_submit_button("✅ Register")
+    with st.form("create_user_form"):
+        new_user = st.text_input("👤 Username", key="admin_username")
+        new_pass = st.text_input("🔑 Password", type="password", key="admin_password")
+        role = st.selectbox("🎓 Role", ["admin", "user"], key="admin_role")
+        workspace = st.text_input("🏢 Workspace Code", key="admin_workspace")
+        submitted = st.form_submit_button("➕ Create User")
 
         if submitted:
-            success = register_user(
-                username=new_user,
-                password=new_pass,
-                role=role,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                phone=phone,
-                workspace=st.session_state.workspace
-            )
+            success = register_user(new_user, new_pass, role, workspace)
             if success:
-                st.success(f"✅ User '{new_user}' registered successfully.")
+                st.success(f"✅ User '{new_user}' created successfully.")
             else:
                 st.error(f"❌ User '{new_user}' already exists.")
 
-    st.markdown("---")
+    st.divider()
     st.subheader("👥 Existing Users")
 
     users = get_all_users()
     for user in users:
-        st.write(f"👤 {user[0]} | Role: {user[2]} | Workspace: {user[3]}")
+        try:
+            st.write(f"👤 {user['username']} | Role: {user['role']} | Workspace: {user['workspace']}")
+        except Exception as e:
+            st.error(f"Error displaying user: {e}")
