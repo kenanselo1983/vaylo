@@ -1,13 +1,8 @@
 import sqlite3
+import pandas as pd
 
-def fetch_data_from_db(db_path="company_data.db"):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM clients")
-    rows = cursor.fetchall()
-
-    data = [dict(row) for row in rows]
+def fetch_data_from_db():
+    conn = sqlite3.connect("company_data.db")
+    df = pd.read_sql_query("SELECT * FROM company_records", conn)
     conn.close()
-    return data
+    return df.to_dict(orient="records")
