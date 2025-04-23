@@ -40,6 +40,6 @@
     "field": "access_time",
     "condition": "older_than_days",
     "value": 30,
-    "message": "❌ Accessed data more than 30 days ago"
+    "message": "❌ Data access is too old (over 30 days)"
   }
 ]
