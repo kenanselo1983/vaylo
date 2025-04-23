@@ -21,6 +21,12 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.user = None
 
+
+
+if not st.session_state.logged_in:
+    login_form()
+    st.stop()
+
 st.markdown(f"👤 Logged in as: `{st.session_state.user}`")
 st.button("🚪 Logout", on_click=logout)
 
@@ -28,15 +34,7 @@ st.button("🚪 Logout", on_click=logout)
 
 
 # Session defaults
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.user = None
-    st.session_state.role = None
-    st.session_state.workspace = None
 
-if not st.session_state.logged_in:
-    login_form()
-    st.stop()
 
 # Top UI
 st.title("📋 Vaylo – Compliance Scanner")
