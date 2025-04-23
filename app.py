@@ -48,30 +48,28 @@ st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
 
 # -------- DATA SOURCE OPTIONS --------
-option = st.radio("Choose data source:", [
-    "Upload CSV",
-    "Scan Local Database",
-    "Load from Google Sheet"
-])
-
+option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database", "Google Sheets"])
 records = []
 
+# Upload CSV
 if option == "Upload CSV":
     uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
     if uploaded_file:
         df = pd.read_csv(uploaded_file)
-        st.success(f"Loaded {len(df)} records.")
+        st.success(f"✅ Loaded {len(df)} records.")
         st.dataframe(df)
         records = df.to_dict(orient="records")
 
+# Scan Local Database
 elif option == "Scan Local Database":
     try:
         records = fetch_data_from_db()
-        st.success(f"Fetched {len(records)} records from company_data.db")
+        st.success(f"✅ Fetched {len(records)} records from local DB.")
         st.dataframe(pd.DataFrame(records))
     except Exception as e:
-        st.error(f"Error fetching data: {e}")
+        st.error(f"❌ Error fetching from DB: {e}")
 
+# Google Sheets
 elif option == "Google Sheets":
     st.subheader("📄 Load Data from Google Sheets")
     st.info("✅ Make sure the sheet is public and ends with `/gviz/tq?tqx=out:csv`")
@@ -88,7 +86,7 @@ elif option == "Google Sheets":
             st.dataframe(df)
             records = df.to_dict(orient="records")
         except Exception as e:
-            st.error(f"❌ Could not load data.\n\n**{type(e).__name__}:** {e}")
+            st.error(f"❌ Could not load data from Google Sheets.\n\n**{type(e).__name__}:** {e}")
 
 # -------- SCANNING --------
 if records:
