@@ -62,17 +62,15 @@ if st.session_state.get("trigger_manual_scan") or should_scan():
         st.error(f"❌ Auto scan failed: {e}")
 
 
-# Store values in session or provide defaults
+# --- Session defaults ---
 if "scan_settings" not in st.session_state:
     st.session_state.scan_settings = {
-        "url": "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv",
-        "interval_days": 2,
-        "last_scanned": None
+        "last_scanned": None,
+        "interval_days": 7
     }
 
-st.session_state.scan_settings["url"] = st.sidebar.text_input("📄 Google Sheet URL", value=st.session_state.scan_settings["url"])
-st.session_state.scan_settings["interval_days"] = st.sidebar.number_input("📅 Scan every X days", min_value=1, value=st.session_state.scan_settings["interval_days"])
-st.sidebar.write(f"🕒 Last scan: {st.session_state.scan_settings['last_scanned'] or 'Never'}")
+if "trigger_manual_scan" not in st.session_state:
+    st.session_state.trigger_manual_scan = False
 
 # Manual trigger
 if st.sidebar.button("🔄 Run Compliance Scan Now"):
