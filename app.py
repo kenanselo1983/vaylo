@@ -47,6 +47,7 @@ st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
 
 option = st.radio("Choose data source:", [
+    st.write("Selected data source:", option)
     "Upload CSV",
     "Scan Local Database",
     "Load from Google Sheet"
