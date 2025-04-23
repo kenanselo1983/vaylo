@@ -1,51 +1,5 @@
 [
   {
-    "id": "rule_001",
-    "field": "purpose",
-    "condition": "equals",
-    "value": "Marketing",
-    "violation_if": {
-      "field": "data_accessed",
-      "condition": "equals",
-      "value": "Medical Records"
-    },
-    "message": "❌ Marketing should not access Medical Records"
-  },
-  {
-    "id": "rule_002",
-    "field": "purpose",
-    "condition": "equals",
-    "value": "Customer Support",
-    "violation_if": {
-      "field": "data_accessed",
-      "condition": "equals",
-      "value": "Payroll"
-    },
-    "message": "❌ Customer Support should not access Payroll"
-  },
-  {
-    "id": "rule_003",
-    "field": "purpose",
-    "condition": "equals",
-    "value": "Internal Audit",
-    "violation_if": {
-      "field": "data_accessed",
-      "condition": "not_in",
-      "value": ["HR Files", "Usage Logs"]
-    },
-    "message": "❌ Internal Audit should only access HR Files or Usage Logs"
-  },
-  {
-    "id": "rule_004",
-    "field": "access_time",
-    "condition": "older_than_days",
-    "value": 30,
-    "message": "❌ Data access is too old (over 30 days)"
-  }
-]
-
-[
-  {
     "name": "Missing Consent",
     "column": "legal_basis",
     "type": "consent_check",
