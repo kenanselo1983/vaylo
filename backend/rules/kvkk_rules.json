@@ -1,20 +1,26 @@
 [
   {
-    "name": "Missing Consent",
+    "name": "Missing Legal Basis",
     "column": "legal_basis",
-    "type": "consent_check",
-    "description": "Check if user has not given consent"
+    "condition": "value is None or value == ''",
+    "message": "No legal basis provided for data processing"
   },
   {
-    "name": "Email Required",
-    "column": "legal_basis",
-    "type": "email_check",
-    "description": "Check if email is missing or invalid"
+    "name": "Consent Not Given",
+    "column": "consent_given",
+    "condition": "value == False",
+    "message": "Data is processed without user consent"
   },
   {
-    "name": "Missing Legal Basis Field",
-    "column": "legal_basis",
-    "type": "missing",
-    "description": "Legal basis data is missing"
+    "name": "Missing Birthdate",
+    "column": "birthdate",
+    "condition": "value is None or value == ''",
+    "message": "Birthdate is missing"
+  },
+  {
+    "name": "Invalid IP Address",
+    "column": "ip_address",
+    "condition": "not isinstance(value, str) or len(value.strip()) < 7",
+    "message": "IP address seems invalid or missing"
   }
 ]

@@ -1,10 +1,26 @@
 [
   {
-    "id": "gdpr_001",
-    "name": "No Legal Basis",
-    "description": "Detects records with no legal basis.",
-    "field_check": ["legal_basis"],
-    "violation_condition": "legal_basis is null",
-    "severity": "high"
+    "name": "Missing Data Retention Policy",
+    "column": "retention_period",
+    "condition": "value is None or value == ''",
+    "message": "No data retention policy defined"
+  },
+  {
+    "name": "No Access Right Statement",
+    "column": "access_rights",
+    "condition": "value is None or value == ''",
+    "message": "Data subject access rights not specified"
+  },
+  {
+    "name": "Unencrypted Sensitive Data",
+    "column": "is_encrypted",
+    "condition": "value == False",
+    "message": "Sensitive data is not encrypted"
+  },
+  {
+    "name": "No DPO Assigned",
+    "column": "dpo_contact",
+    "condition": "value is None or value == ''",
+    "message": "No Data Protection Officer contact provided"
   }
 ]
