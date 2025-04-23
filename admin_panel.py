@@ -24,6 +24,7 @@ def admin_panel():
     users = get_all_users()
     for user in users:
         try:
-            st.write(f"👤 {user['username']} | Role: {user['role']} | Workspace: {user['workspace']}")
+            username, role, workspace = user  # unpack the tuple
+            st.write(f"👤 {username} | Role: {role} | Workspace: {workspace}")
         except Exception as e:
             st.error(f"Error displaying user: {e}")
