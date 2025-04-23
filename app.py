@@ -73,17 +73,22 @@ elif option == "Scan Local Database":
         st.error(f"❌ Error fetching from DB: {e}")
 
 elif option == "Google Sheet":
+    from backend.google_loader import load_google_sheet
     st.subheader("📄 Load Data from Google Sheets")
-    st.info("✅ Make sure the sheet is public and ends with `/gviz/tq?tqx=out:csv`")
-    sheet_url = st.text_input("Paste Google Sheet CSV URL", value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv")
-    if sheet_url:
-        try:
-            df = pd.read_csv(sheet_url)
-            st.success(f"✅ Loaded {len(df)} rows from Google Sheets.")
-            st.dataframe(df)
-            records = df.to_dict(orient="records")
-        except Exception as e:
-            st.error(f"❌ Could not load data. Check the sheet URL.\n\n{e}")
+    st.info("✅ The sheet must be public and must end with `/gviz/tq?tqx=out:csv`")
+
+    sheet_url = st.text_input(
+        "Paste Google Sheet CSV URL",
+        value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+    )
+
+    if st.button("🔄 Load Google Sheet"):
+        records = load_google_sheet(sheet_url)
+        if records:
+            st.success(f"✅ Loaded {len(records)} rows from Google Sheet.")
+            st.dataframe(pd.DataFrame(records))
+        else:
+            st.error("❌ Could not load data. Check the URL or make the sheet public.")
 
 # --- Evaluation ---
 if records:
