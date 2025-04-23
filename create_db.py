@@ -1,17 +1,12 @@
 import sqlite3
-import random
 from faker import Faker
 from datetime import datetime, timedelta
+import random
 
 faker = Faker()
-purposes = ["Internal Audit", "Marketing", "Legal", "Research", "Customer Support"]
-data_types = ["Customer Financial Info", "Medical Records", "HR Files", "Payroll", "Usage Logs"]
-
 conn = sqlite3.connect("company_data.db")
 c = conn.cursor()
-
 c.execute("DROP TABLE IF EXISTS company_records")
-
 c.execute("""
 CREATE TABLE company_records (
     employee_id TEXT,
@@ -23,33 +18,65 @@ CREATE TABLE company_records (
 )
 """)
 
-# Add 40 violating rows
-violations = [
-    ("Marketing", "Medical Records"),
-    ("Customer Support", "Payroll"),
-    ("Internal Audit", "Medical Records"),
-    ("Internal Audit", "Customer Financial Info")
-]
+# Violation 1: Marketing accessing Medical Records
+for _ in range(10):
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", (
+        f"E{random.randint(1000,9999)}",
+        faker.name(),
+        faker.email(),
+        "Medical Records",
+        datetime.now().strftime("%Y-%m-%d"),
+        "Marketing"
+    ))
 
-for purpose, data_accessed in violations * 10:
-    employee_id = f"E{random.randint(1000, 9999)}"
-    full_name = faker.name()
-    email = faker.email()
-    access_time = (datetime.now() - timedelta(days=random.randint(31, 90))).strftime("%Y-%m-%d")  # >30 days
-    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", 
-              (employee_id, full_name, email, data_accessed, access_time, purpose))
+# Violation 2: Customer Support accessing Payroll
+for _ in range(10):
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", (
+        f"E{random.randint(1000,9999)}",
+        faker.name(),
+        faker.email(),
+        "Payroll",
+        datetime.now().strftime("%Y-%m-%d"),
+        "Customer Support"
+    ))
 
-# Add 60 clean rows
-for _ in range(60):
-    employee_id = f"E{random.randint(1000, 9999)}"
-    full_name = faker.name()
-    email = faker.email()
-    purpose = random.choice(purposes)
-    data_accessed = random.choice(data_types)
-    access_time = (datetime.now() - timedelta(days=random.randint(0, 25))).strftime("%Y-%m-%d")
-    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", 
-              (employee_id, full_name, email, data_accessed, access_time, purpose))
+# Violation 3: Internal Audit accessing unauthorized data
+for _ in range(10):
+    invalid_data = random.choice(["Medical Records", "Customer Financial Info", "Payroll"])
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", (
+        f"E{random.randint(1000,9999)}",
+        faker.name(),
+        faker.email(),
+        invalid_data,
+        datetime.now().strftime("%Y-%m-%d"),
+        "Internal Audit"
+    ))
+
+# Violation 4: Data older than 30 days
+for _ in range(10):
+    old_date = (datetime.now() - timedelta(days=random.randint(31, 90))).strftime("%Y-%m-%d")
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", (
+        f"E{random.randint(1000,9999)}",
+        faker.name(),
+        faker.email(),
+        "HR Files",
+        old_date,
+        "Legal"
+    ))
+
+# Clean data rows
+clean_data_types = ["HR Files", "Usage Logs"]
+clean_purposes = ["Legal", "Research"]
+for _ in range(40):
+    c.execute("INSERT INTO company_records VALUES (?, ?, ?, ?, ?, ?)", (
+        f"E{random.randint(1000,9999)}",
+        faker.name(),
+        faker.email(),
+        random.choice(clean_data_types),
+        datetime.now().strftime("%Y-%m-%d"),
+        random.choice(clean_purposes)
+    ))
 
 conn.commit()
 conn.close()
-print("✅ company_data.db updated with 100 records including violations.")
+print("✅ Database generated with 100 rows (40 with known violations).")
