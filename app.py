@@ -46,7 +46,6 @@ st.title("📋 Vaylo – Compliance Scanner")
 st.caption(f"👤 Logged in as: {st.session_state.user}")
 st.button("Logout", on_click=logout)
 
-# -------- DATA SOURCE OPTIONS --------
 option = st.radio("Choose data source:", [
     "Upload CSV",
     "Scan Local Database",
@@ -72,16 +71,15 @@ elif option == "Scan Local Database":
         st.error(f"Error fetching data: {e}")
 
 elif option == "Load from Google Sheet":
-    sheet_url = st.text_input("Paste Google Sheet URL", value="https://docs.google.com/spreadsheets/d/1yIQNKxOWv0RqpBzTnXOVCIm1yEhrVKXuj1scV_lWjzg/edit?usp=sharing")
-    if st.button("🔄 Load Data"):
+    sheet_url = st.text_input("Paste Google Sheet CSV URL")
+    if st.button("🔄 Load Google Sheet"):
         records = load_google_sheet(sheet_url)
         if records:
-            st.success(f"✅ Loaded {len(records)} records from Google Sheet.")
+            st.success(f"✅ Loaded {len(records)} rows from Google Sheet.")
             st.dataframe(pd.DataFrame(records))
         else:
-            st.error("❌ Could not load data. Check the sheet URL.")
+            st.error("❌ Couldn’t load sheet. Make sure it’s public and ends with /gviz/tq?tqx=out:csv")
 
-# -------- SCANNING --------
 if records:
     kvkk = load_rules("backend/rules/kvkk_rules.json")
     gdpr = load_rules("backend/rules/gdpr_rules.json")
@@ -92,7 +90,7 @@ if records:
     color = "🟢" if score >= 80 else "🟡" if score >= 50 else "🔴"
     st.subheader(f"🧮 Risk Score: {score}/100 {color}")
 
-    if st.button("🧠 Explain Risk Score"):
+    if st.button("�� Explain Risk Score"):
         explanation = explain_risk_with_ai(score, results)
         st.text_area("📋 Risk Summary", explanation, height=300)
 
@@ -117,7 +115,6 @@ if records:
     else:
         st.success("🎉 No violations found!")
 
-# -------- POLICY AI --------
 st.markdown("---")
 st.subheader("📄 Upload Privacy Policy (.docx or .txt)")
 
@@ -132,12 +129,9 @@ if uploaded_policy:
         st.text_area("📖 Extracted Policy Text", policy_text, height=200)
 
     if st.button("🧠 Summarize and Suggest"):
-        with st.spinner("Thinking..."):
-            result = summarize_policy(policy_text)
-            st.success("✅ Summary and suggestions ready:")
-            st.text_area("📋 Policy AI Output", result, height=300)
+        result = summarize_policy(policy_text)
+        st.text_area("📋 Policy AI Output", result, height=300)
 
-# -------- KVKK UPDATE --------
 st.markdown("---")
 st.subheader("🧠 KVKK Update Summary (AI-Powered)")
 
@@ -146,10 +140,8 @@ if st.button("Fetch KVKK Summary"):
         text = fetch_kvkk_updates()
         st.text_area("📄 Raw KVKK Text", text, height=200)
         summary = summarize(text)
-        st.success("✅ AI summary complete")
         st.text_area("📄 Summary", summary, height=300)
 
-# -------- CHATBOT --------
 st.markdown("---")
 st.subheader("💬 KVKK/GDPR Chatbot")
 
@@ -170,17 +162,3 @@ if user_input:
             answer = ask_chatbot(st.session_state.chat_history)
             st.markdown(answer)
     st.session_state.chat_history.append({"role": "assistant", "content": answer})
-
-elif option == "Load from Google Sheet":
-    sheet_url = st.text_input(
-        "Paste Google Sheet CSV URL",
-        value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
-    )
-
-    if st.button("🔄 Load Google Sheet"):
-        records = load_google_sheet(sheet_url)
-        if records:
-            st.success(f"✅ Loaded {len(records)} rows from Google Sheet.")
-            st.dataframe(pd.DataFrame(records))
-        else:
-            st.error("❌ Couldn’t load sheet. Make sure it’s public and the URL is correct.")
