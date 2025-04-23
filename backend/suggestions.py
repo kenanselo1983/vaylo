@@ -15,7 +15,7 @@ def suggest_fixes(violations):
     }
 
     payload = {
-        "model": "mistral/mistral-7b-instruct",
+        "model": "mistralai/mistral-7b-instruct",
         "messages": [
             {"role": "system", "content": "You are a compliance consultant. Suggest how to fix the following GDPR/KVKK violations."},
             {"role": "user", "content": violation_text}
