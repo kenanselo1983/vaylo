@@ -17,12 +17,12 @@ from backend.policy_ai import summarize_policy
 from backend.google_loader import load_google_sheet
 from backend.login import login_ui, logout
 from admin_panel import admin_panel
+from datetime import datetime, timedelta
 
 # 🔁 Handle logout rerun
 if st.session_state.get("logout_triggered"):
     st.session_state.logout_triggered = False  # reset the trigger
     st.rerun()
-
 
 # --- Login Check ---
 if "logged_in" not in st.session_state:
@@ -35,12 +35,16 @@ if not st.session_state.logged_in:
     login_ui()
     st.stop()
 
-    from datetime import datetime, timedelta
+# --- Session defaults (must come before any use) ---
+if "scan_settings" not in st.session_state:
+    st.session_state.scan_settings = {
+        "last_scanned": None,
+        "interval_days": 7,
+        "url": "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+    }
 
-st.sidebar.markdown("### ⚙️ Auto Scan Settings")
-
-
-from datetime import datetime
+if "trigger_manual_scan" not in st.session_state:
+    st.session_state.trigger_manual_scan = False
 
 records = []
 
@@ -50,6 +54,7 @@ def should_scan():
         return True
     return datetime.now() >= datetime.strptime(last, "%Y-%m-%d") + timedelta(days=st.session_state.scan_settings["interval_days"])
 
+# Run auto scan or manual scan
 if st.session_state.get("trigger_manual_scan") or should_scan():
     try:
         df = load_google_sheet(st.session_state.scan_settings["url"])
@@ -61,21 +66,9 @@ if st.session_state.get("trigger_manual_scan") or should_scan():
     except Exception as e:
         st.error(f"❌ Auto scan failed: {e}")
 
-
-# --- Session defaults ---
-if "scan_settings" not in st.session_state:
-    st.session_state.scan_settings = {
-        "last_scanned": None,
-        "interval_days": 7
-    }
-
-if "trigger_manual_scan" not in st.session_state:
-    st.session_state.trigger_manual_scan = False
-
-# Manual trigger
+# Manual trigger button
 if st.sidebar.button("🔄 Run Compliance Scan Now"):
     st.session_state.trigger_manual_scan = True
-
 
 # --- UI ---
 st.set_page_config(page_title="Vaylo Compliance Scanner", layout="wide")
@@ -96,7 +89,6 @@ else:
 
 # --- Data Input ---
 option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database", "Google Sheet"])
-records = []
 
 if option == "Upload CSV":
     uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
@@ -115,7 +107,6 @@ elif option == "Scan Local Database":
         st.error(f"❌ Error fetching from DB: {e}")
 
 elif option == "Google Sheet":
-    from backend.google_loader import load_google_sheet
     st.subheader("📄 Load Data from Google Sheets")
     st.info("✅ The sheet must be public and must end with `/gviz/tq?tqx=out:csv`")
 
