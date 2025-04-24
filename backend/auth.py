@@ -1,35 +1,28 @@
-import sqlite3
-import os
+from supabase import create_client, Client
 
-DB_PATH = os.path.join("backend", "users.db")
+SUPABASE_URL = "https://jfecmgsrzgkzecvnoecx.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmZWNtZ3NyemdremVjdm5vZWN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTUwMzksImV4cCI6MjA2MTA3MTAzOX0.lUQcsmnwdVicjLefZnD9y8LEs68EGgw3u39YEfpbUzM"
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def authenticate_user(username, password, workspace):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT role FROM users WHERE username=? AND password=? AND workspace=?", (username, password, workspace))
-    result = c.fetchone()
-    conn.close()
-    if result:
-        return True, result[0]
+    response = supabase.table("users").select("role").eq("username", username).eq("password", password).eq("workspace", workspace).execute()
+    if response.data and len(response.data) > 0:
+        return True, response.data[0]["role"]
     return False, None
 
 def register_user(username, password, role, workspace):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    try:
-        c.execute("INSERT INTO users (username, password, role, workspace) VALUES (?, ?, ?, ?)",
-                  (username, password, role, workspace))
-        conn.commit()
-        return True
-    except sqlite3.IntegrityError:
+    existing = supabase.table("users").select("id").eq("username", username).execute()
+    if existing.data:
         return False
-    finally:
-        conn.close()
+    supabase.table("users").insert({
+        "username": username,
+        "password": password,
+        "role": role,
+        "workspace": workspace
+    }).execute()
+    return True
 
 def get_all_users():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT username, role, workspace FROM users")
-    users = c.fetchall()
-    conn.close()
-    return users
+    response = supabase.table("users").select("*").execute()
+    return response.data if response.data else []
