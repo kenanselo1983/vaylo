@@ -40,3 +40,15 @@ def get_all_users():
     except Exception as e:
         print("❌ Fetch users error:", e)
         return []
+
+def authenticate_user(username, password, workspace):
+    print(f"🔍 Authenticating: {username}, {password}, {workspace}")
+    try:
+        result = supabase.table("users").select("*").eq("username", username).eq("password", password).eq("workspace", workspace).execute()
+        user = result.data[0] if result.data else None
+        if user:
+            return True, user["role"]
+        return False, None
+    except Exception as e:
+        print(f"❌ Error authenticating: {e}")
+        return False, None
