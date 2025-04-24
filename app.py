@@ -1,9 +1,10 @@
 # ✅ THIS IS THE REAL app.py BEING READ
-# Trigger rebuild
 
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
+from datetime import datetime, timedelta
+
 from backend.rule_engine import evaluate_data, load_rules
 from backend.scanner import fetch_data_from_db
 from backend.pdf_exporter import generate_html_report
@@ -17,11 +18,13 @@ from backend.policy_ai import summarize_policy
 from backend.google_loader import load_google_sheet
 from backend.login import login_ui, logout
 from admin_panel import admin_panel
-from datetime import datetime, timedelta
+
+# --- Page Config (must be first Streamlit command) ---
+st.set_page_config(page_title="Vaylo Compliance Scanner", layout="wide")
 
 # 🔁 Handle logout rerun
 if st.session_state.get("logout_triggered"):
-    st.session_state.logout_triggered = False  # reset the trigger
+    st.session_state.logout_triggered = False
     st.rerun()
 
 # --- Login Check ---
@@ -35,47 +38,33 @@ if not st.session_state.logged_in:
     login_ui()
     st.stop()
 
-# --- Session defaults (must come before any use) ---
+# --- Session defaults ---
 if "scan_settings" not in st.session_state:
     st.session_state.scan_settings = {
+        "url": "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv",
         "last_scanned": None,
-        "interval_days": 7,
-        "url": "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+        "interval_days": 7
     }
 
 if "trigger_manual_scan" not in st.session_state:
     st.session_state.trigger_manual_scan = False
 
-records = []
+# --- Sidebar Settings ---
+st.sidebar.markdown("### ⚙️ Auto Scan Settings")
+st.sidebar.number_input("Days Between Auto Scans", min_value=1, max_value=30,
+                        value=st.session_state.scan_settings["interval_days"],
+                        key="interval_input")
+st.session_state.scan_settings["interval_days"] = st.session_state.interval_input
 
-def should_scan():
-    last = st.session_state.scan_settings["last_scanned"]
-    if not last:
-        return True
-    return datetime.now() >= datetime.strptime(last, "%Y-%m-%d") + timedelta(days=st.session_state.scan_settings["interval_days"])
-
-# Run auto scan or manual scan
-if st.session_state.get("trigger_manual_scan") or should_scan():
-    try:
-        df = load_google_sheet(st.session_state.scan_settings["url"])
-        st.success(f"✅ Auto-loaded {len(df)} rows from Google Sheets.")
-        st.dataframe(df)
-        records = df.to_dict(orient="records")
-        st.session_state.scan_settings["last_scanned"] = datetime.now().strftime("%Y-%m-%d")
-        st.session_state.trigger_manual_scan = False
-    except Exception as e:
-        st.error(f"❌ Auto scan failed: {e}")
-
-# Manual trigger button
 if st.sidebar.button("🔄 Run Compliance Scan Now"):
     st.session_state.trigger_manual_scan = True
 
-# --- UI ---
-st.set_page_config(page_title="Vaylo Compliance Scanner", layout="wide")
-st.title("📋 Vaylo – Compliance Scanner")
-st.caption(f"👤 Logged in as: {st.session_state.username} ({st.session_state.role}) – Workspace: {st.session_state.workspace}")
 st.sidebar.success(f"👤 {st.session_state.username} | 🏢 {st.session_state.workspace} | 🎓 {st.session_state.role}")
 st.sidebar.button("🚪 Logout", on_click=logout)
+
+# --- Main Header ---
+st.title("📋 Vaylo – Compliance Scanner")
+st.caption(f"👤 Logged in as: {st.session_state.username} ({st.session_state.role}) – Workspace: {st.session_state.workspace}")
 
 # --- Admin Panel ---
 if st.session_state.role == "admin":
@@ -87,7 +76,27 @@ if st.session_state.role == "admin":
 else:
     st.header("📊 Compliance Scanner")
 
-# --- Data Input ---
+# --- Auto Scan Logic ---
+records = []
+
+def should_scan():
+    last = st.session_state.scan_settings.get("last_scanned")
+    if not last:
+        return True
+    return datetime.now() >= datetime.strptime(last, "%Y-%m-%d") + timedelta(days=st.session_state.scan_settings["interval_days"])
+
+if st.session_state.get("trigger_manual_scan") or should_scan():
+    try:
+        df = load_google_sheet(st.session_state.scan_settings["url"])
+        st.success(f"✅ Auto-loaded {len(df)} rows from Google Sheets.")
+        st.dataframe(df)
+        records = df.to_dict(orient="records")
+        st.session_state.scan_settings["last_scanned"] = datetime.now().strftime("%Y-%m-%d")
+        st.session_state.trigger_manual_scan = False
+    except Exception as e:
+        st.error(f"❌ Auto scan failed: {e}")
+
+# --- Manual Data Input ---
 option = st.radio("Choose data source:", ["Upload CSV", "Scan Local Database", "Google Sheet"])
 
 if option == "Upload CSV":
@@ -110,18 +119,17 @@ elif option == "Google Sheet":
     st.subheader("📄 Load Data from Google Sheets")
     st.info("✅ The sheet must be public and must end with `/gviz/tq?tqx=out:csv`")
 
-    sheet_url = st.text_input(
-        "Paste Google Sheet CSV URL",
-        value="https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
-    )
+    sheet_url = st.text_input("Paste Google Sheet CSV URL",
+        value=st.session_state.scan_settings.get("url", ""))
 
     if st.button("🔄 Load Google Sheet"):
-        records = load_google_sheet(sheet_url)
-        if records:
-            st.success(f"✅ Loaded {len(records)} rows from Google Sheet.")
-            st.dataframe(pd.DataFrame(records))
-        else:
-            st.error("❌ Could not load data. Check the URL or make the sheet public.")
+        try:
+            df = load_google_sheet(sheet_url)
+            st.success(f"✅ Loaded {len(df)} rows from Google Sheet.")
+            st.dataframe(df)
+            records = df.to_dict(orient="records")
+        except Exception as e:
+            st.error(f"❌ Could not load data. Check the URL or make the sheet public.\n\n{e}")
 
 # --- Evaluation ---
 if records:
