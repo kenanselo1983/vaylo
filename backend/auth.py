@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.abspath("users.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
 
 def ensure_users_table():
     conn = sqlite3.connect(DB_PATH)
