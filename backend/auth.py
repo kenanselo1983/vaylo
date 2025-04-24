@@ -1,27 +1,7 @@
 import sqlite3
 import os
 
-# ✅ Ensure persistent DB location
-DB_FOLDER = "data"
-DB_PATH = os.path.join(DB_FOLDER, "users.db")
-
-# Create folder if it doesn't exist
-os.makedirs(DB_FOLDER, exist_ok=True)
-
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            role TEXT NOT NULL,
-            workspace TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+DB_PATH = os.path.join("backend", "users.db")
 
 def authenticate_user(username, password, workspace):
     conn = sqlite3.connect(DB_PATH)
@@ -34,15 +14,17 @@ def authenticate_user(username, password, workspace):
     return False, None
 
 def register_user(username, password, role, workspace):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
     try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("INSERT INTO users (username, password, role, workspace) VALUES (?, ?, ?, ?)", (username, password, role, workspace))
+        c.execute("INSERT INTO users (username, password, role, workspace) VALUES (?, ?, ?, ?)",
+                  (username, password, role, workspace))
         conn.commit()
-        conn.close()
         return True
     except sqlite3.IntegrityError:
         return False
+    finally:
+        conn.close()
 
 def get_all_users():
     conn = sqlite3.connect(DB_PATH)
@@ -51,6 +33,3 @@ def get_all_users():
     users = c.fetchall()
     conn.close()
     return users
-
-# ✅ Run once to ensure DB is initialized
-init_db()
