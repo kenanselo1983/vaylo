@@ -39,9 +39,5 @@ def register_user(username, password, role, workspace):
         return False
 
 def get_all_users():
-    try:
-        result = supabase.table("users").select("*").execute()
-        return result.data
-    except Exception as e:
-        st.error(f"❌ Fetching users failed: {e}")
-        return []
+    users = supabase.table("users").select("*").execute()
+    return users.data  # this will be a list of dicts
