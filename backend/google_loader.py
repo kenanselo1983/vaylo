@@ -1,12 +1,20 @@
+# ✅ backend/google_loader.py
+
 import pandas as pd
 
-# Default public Google Sheet URL (you can override from app.py)
-DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/10DReLchE2zNPvbqEIf19XU69lpni_0-w1NTOBFnhN34/gviz/tq?tqx=out:csv"
+def load_google_sheet(url: str) -> pd.DataFrame:
+    """
+    Loads a Google Sheet in CSV format and returns a DataFrame.
+    The URL must end with: /gviz/tq?tqx=out:csv
 
-def load_google_sheet(sheet_url=DEFAULT_SHEET_URL):
+    Args:
+        url (str): Google Sheet CSV URL
+
+    Returns:
+        pd.DataFrame: Parsed data as DataFrame
+    """
     try:
-        df = pd.read_csv(sheet_url)
-        return df.to_dict(orient="records")
+        df = pd.read_csv(url)
+        return df
     except Exception as e:
-        print(f"❌ Failed to load Google Sheet: {e}")
-        return []
+        raise RuntimeError(f"Failed to load Google Sheet: {e}")
